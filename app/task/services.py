@@ -5,35 +5,34 @@ from fastapi import HTTPException
 
 
 # Create Task
-def create_task(new_task : TaskCreate) -> TaskOut:
+def create_task(session:Session, new_task : TaskCreate) -> TaskOut:
   task = Task(title=new_task.title, content=new_task.content)
-  with Session(engine) as session:
-    session.add(task)
-    session.commit()
-    session.refresh(task)
-    return task 
+  session.add(task)
+  session.commit()
+  session.refresh(task)
+  return task 
+  
   
 # Get All Tasks
-def get_tasks()-> list[TaskOut]:
-  with Session(engine) as session:
+def get_tasks(session:Session)-> list[TaskOut]:
     statement = select(Task)
     tasks = session.exec(statement).all()
     if not tasks:
       raise HTTPException(status_code=404, detail="Task not found")
     return tasks
+  
       
   
 # Get Task by ID
-def get_task_by_id(task_id: int) -> TaskOut:
-  with Session(engine) as session:
+def get_task_by_id(session:Session, task_id: int) -> TaskOut:
     task = session.get(Task, task_id)
     if not task:
       raise HTTPException(status_code=404, detail="Task not found")
     return task
   
+  
 # Update Task
-def update_task(task_id: int, new_task: TaskUpdate):
-  with Session(engine) as session:
+def update_task(session:Session, task_id: int, new_task: TaskUpdate):
     task = session.get(Task, task_id)
     if not task:
       raise HTTPException(status_code=404, detail="Task not found")
@@ -44,9 +43,9 @@ def update_task(task_id: int, new_task: TaskUpdate):
     session.refresh(task)
     return task
   
+  
 # Update Partial Task
-def patch_task(task_id: int, new_task: TaskPatch)-> TaskOut:
-  with Session(engine) as session:
+def patch_task(session:Session, task_id: int, new_task: TaskPatch)-> TaskOut:
     task = session.get(Task, task_id)
     if not task:
       raise HTTPException(status_code=404, detail="Task not found")
@@ -59,15 +58,16 @@ def patch_task(task_id: int, new_task: TaskPatch)-> TaskOut:
     session.refresh(task)
     return task
   
+  
 # Delete Task 
-def delete_task(task_id: int):
-  with Session(engine) as session:
+def delete_task(session:Session, task_id: int):
     task = session.get(Task, task_id)
     if not task:
       raise HTTPException(status_code=404, detail="Task not found")
     session.delete(task)
     session.commit()
     return {"Ok": True}
+  
       
     
   
