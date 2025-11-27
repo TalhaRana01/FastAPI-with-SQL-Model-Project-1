@@ -38,6 +38,6 @@ def patch_task_update(task_id: int, new_task: dict):
 
 # Delete Task
 @app.delete("/task/{task_id}")
-def delete(task_id: int):
+def task_delete(task_id: int):
   task = delete_task(task_id)
   return task

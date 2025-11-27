@@ -10,7 +10,7 @@ def create_task(title: str, content:str):
   with Session(engine) as session:
     session.add(task)
     session.commit()
-    session.refresh()
+    session.refresh(task)
     return task 
   
 # Get Task by ID
@@ -55,7 +55,7 @@ def delete_task(task_id: int):
     task = session.get(Task, task_id)
     if not task:
       raise HTTPException(status_code=404, detail="Task not found")
-    session.add(task)
+    session.delete(task)
     session.commit()
     return task
       
